@@ -18,11 +18,6 @@ use DB;
 
 class WarrantyClaimInfoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $inputs = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>''];
@@ -46,18 +41,12 @@ class WarrantyClaimInfoController extends Controller
         // dd($engineers);
         // $allParts = Parts::orderBy('PartsCode', 'asc')->get();
         $allParts = DB::select("SELECT ProductCode,ProductName,UnitPrice from
-                    [192.168.100.25].MotorSparePartsMirror.dbo.Product as P 
+                    [192.168.100.25].MotorSparePartsMirror.dbo.Product as P
                     WHERE P.Business IN('Q','W') order by ProductCode asc");
 
         return view('admin.warranty_claim_info.create', compact('products', 'engineers', 'allParts'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         // return $request->all();
@@ -121,12 +110,6 @@ class WarrantyClaimInfoController extends Controller
         return redirect(route('claim-warranty.index'))->with('success', 'Warranty Claim info created successfully');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $warranty = WarrantyClaimInfo::findOrFail($id);
@@ -134,12 +117,6 @@ class WarrantyClaimInfoController extends Controller
         return view('admin.warranty_claim_info.show', compact('warranty'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $products = Product::all();
@@ -152,13 +129,6 @@ class WarrantyClaimInfoController extends Controller
         return view('admin.warranty_claim_info.edit', compact('products', 'engineers', 'allParts', 'warranty', 'partsDetails'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -220,12 +190,6 @@ class WarrantyClaimInfoController extends Controller
         return redirect(route('claim-warranty.index'))->with('success', 'Warranty Claim info updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $warranty = WarrantyClaimInfo::findOrFail($id);
@@ -307,7 +271,7 @@ class WarrantyClaimInfoController extends Controller
 
         return view('admin.warranty_claim_info.list', compact('warrantyClaims', 'inputs'));
     }
-    
+
     // public function searchWarrantyClaimInfoByProduct(Request $request)
     // {
     //     $user = Auth::user();
@@ -366,7 +330,7 @@ class WarrantyClaimInfoController extends Controller
         $warrantyClaim->save();
         return redirect(route('claim-warranty.index'));
     }
-    
+
     public function SpoInvoiceClaimDone($id)
     {
         $warrantyClaim = WarrantyClaimInfo::findOrFail($id);
@@ -374,7 +338,7 @@ class WarrantyClaimInfoController extends Controller
         $warrantyClaim->save();
         return redirect(route('claim-warranty.index'));
     }
-    
+
     public function AdminAskingPartsToSpo($id)
     {
         $warrantyClaim = WarrantyClaimInfo::findOrFail($id);
@@ -383,14 +347,15 @@ class WarrantyClaimInfoController extends Controller
         return redirect(route('claim-warranty.index'));
     }
 
-    public function unlockEngineerWarrantyBtn(Request $request)
-    {
-        $warrantyClaimId = $request->warranty_claim_id;
-        // dd($warrantyClaimId);
-        $warrantyClaim = WarrantyClaimInfo::findOrFail($warrantyClaimId);
-        $warrantyClaim->Locked = 0;
+    public function warrantyClaimLockUnlock($id){
+        $warrantyClaim = WarrantyClaimInfo::findOrFail($id);
+        if ($warrantyClaim->Locked == 0){
+            $warrantyClaim->Locked = 1;
+        }else{
+            $warrantyClaim->Locked = 0;
+        }
         $warrantyClaim->save();
-        return response()->json(['success'=>'Unlocked Successfully']);
+        return redirect()->back()->with('success', 'Changed successfully');
     }
 
     public function sendsms($ip, $userid, $password, $smstext, $receipient) {

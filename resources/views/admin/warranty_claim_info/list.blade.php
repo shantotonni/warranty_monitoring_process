@@ -164,34 +164,36 @@
 
                     <table id="table_id" class="table table-bordered table-striped table-sm small text-nowrap display" style="width:100%">
                         <thead style="background-color: #5B627E;color:white;">
-                            <th>SL</th>
-                            <th>Product</th>
-                            @if (Auth::user()->RoleId == 2)
-                            <th>Warranty Number</th>
-                            @endif
-                            <th>Engineer</th>
-                            <th>SPO</th>
-                            <th>Purpose</th>
-                            <th>Created At</th>
-                            <th>Customer Code</th>
-                            <th>Customer Name</th>
-                            <th>Customer Number</th>
-                            <th>Chassis Number</th>
-                            <th>Parts Code</th>
-                            <th>Parts Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            @if (Auth::user()->RoleId == 2)
-                            <th>Download All Documents</th>
-                            @endif
-                            <th>Status</th>
-                            @if (Auth::user()->RoleId == 2)
-                            <th>Is Warranty Claim Done</th>
-                            @endif
-                            @if (Auth::user()->RoleId == 1)
-                            <th>Is Invoice Done</th>
-                            @endif
-                            <th>Controls</th>
+                           <tr>
+                               <th>SL</th>
+                               <th>Product</th>
+                               @if (Auth::user()->RoleId == 2)
+                                   <th>Warranty Number</th>
+                               @endif
+                               <th>Engineer</th>
+                               <th>SPO</th>
+                               <th>Purpose</th>
+                               <th>Created At</th>
+                               <th>Customer Code</th>
+                               <th>Customer Name</th>
+                               <th>Customer Number</th>
+                               <th>Chassis Number</th>
+                               <th>Parts Code</th>
+                               <th>Parts Name</th>
+                               <th>Quantity</th>
+                               <th>Price</th>
+                               @if (Auth::user()->RoleId == 2)
+                                   <th>Download All Documents</th>
+                               @endif
+                               <th>Status</th>
+                               @if (Auth::user()->RoleId == 2)
+                                   <th>Is Warranty Claim Done</th>
+                               @endif
+                               @if (Auth::user()->RoleId == 1)
+                                   <th>Is Invoice Done</th>
+                               @endif
+                               <th>Controls</th>
+                           </tr>
                         </thead>
                         <tbody>
                             @foreach ($warrantyClaims as $warrantyClaim)
@@ -277,23 +279,17 @@
                                     <form action="{{ url('/admin/download-approval') }}" method="POST">
                                         @csrf
                                         <input type="hidden" value="{{ $warrantyClaim->Id }}" name="downloadId">
-                                        <button type="submit" class="btn btn-sm btn-success btn-flat"><i class="fa fa-paperclip" aria-hidden="true"></i> Download
-                                            Approval
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-success btn-flat"><i class="fa fa-paperclip" aria-hidden="true"></i> Download Approval</button>
                                     </form>
                                     @endif
-
                                 </td>
                                 @endif
-
-
 
                                 @if (Auth::user()->RoleId == 2)
                                 @if ($warrantyClaim->Status == 'Submitted')
                                 @php $myId = $warrantyClaim->Id; @endphp
                                 <td>
-                                    <button type="button" onclick="openModal({{ $myId }})" class="btn btn-sm btn-warning" data-toggle="modal"><i class="fa fa-upload" aria-hidden="true"></i> Upload
-                                        Approval</button>
+                                    <button type="button" onclick="openModal({{ $myId }})" class="btn btn-sm btn-warning" data-toggle="modal"><i class="fa fa-upload" aria-hidden="true"></i> Upload Approval</button>
                                 </td>
                                 @else
                                 <td>
@@ -340,7 +336,6 @@
                                 @else
                                 <td></td>
                                 @endif
-
 
 
                                 <td>
@@ -394,11 +389,17 @@
                                         <button type="button" class="btn btn-sm btn-info btn-flat"><i class="fas fa-edit"></i></button>
                                     </a>
                                     <a id="openDeleteModal" data-toggle="modal" data-id="{{ $warrantyClaim->Id }}" title="Delete" href=""><button type="button" class="btn btn-sm btn-danger btn-flat"><i class="fas fa-trash" aria-hidden="true"></i>
-                                        </button></a>
-                                    @if($warrantyClaim->Locked == 1)
-                                        <button type="button" id="unlockBtn{{$warrantyClaim->Id}}" class="btn btn-sm btn-dark" title="Unlock Engineer Warranty Submit Button" onclick="unlockEngineerWarrantyBtn({{$warrantyClaim->Id}})" ><i class="fa fa-unlock" aria-hidden="true"></i></button>
+                                        </button>
+                                    </a>
+                                    @if (Auth::user()->RoleId == 2)
+                                    @if ($warrantyClaim->Status == 'Pending')
+                                        @if($warrantyClaim->Locked == 1)
+                                        <a href="{{ route('warranty.claim.lock',$warrantyClaim->Id) }}" class="btn btn-sm btn-dark"><i class="fa fa-unlock" aria-hidden="true"></i> Unlock</a>
+                                        @else
+                                           <a href="{{ route('warranty.claim.lock',$warrantyClaim->Id) }}" class="btn btn-sm btn-dark"><i class="fa fa-unlock" aria-hidden="true"></i> Lock</a>
+                                        @endif
                                     @endif
-
+                                    @endif
                                     @endif
                                     @endif
 
@@ -407,8 +408,8 @@
                                         <button type="button" class="btn btn-sm btn-primary btn-flat"><i class="fas fa-eye" aria-hidden="true"></i>
                                         </button>
                                     </a>
-                                    @php 
-                                    $current=\Carbon\Carbon::now()->toDateString(); 
+                                    @php
+                                    $current=\Carbon\Carbon::now()->toDateString();
                                     $to = \Carbon\Carbon::parse($warrantyClaim->CreatedAt);
                                     // dd($to->diffInDays($current));
                                     @endphp
@@ -416,9 +417,8 @@
                                     <a href="{{ url('/engineer-warranty-claims/' . $warrantyClaim->Id . '/edit') }}" title="Edit">
                                         <button type="button" class="btn btn-sm btn-info btn-flat"><i class="fas fa-edit"></i></button>
                                     </a>
-                                    <!-- <a id="openDeleteModal" data-toggle="modal" data-id="{{ $warrantyClaim->Id }}" title="Delete"  href=""><button type="button" class="btn btn-sm btn-danger btn-flat"><i class="fas fa-trash" aria-hidden="true"></i> -->
-                                    <!-- </button></a> -->
                                     @endif
+
                                     @endif
 
                                 </td>
@@ -630,8 +630,8 @@
             type: 'POST',
             url: url,
             data: {
-                    warranty_claim_id: warranty_claim_id, 
-                    "_token":"{{ csrf_token() }}" 
+                    warranty_claim_id: warranty_claim_id,
+                    "_token":"{{ csrf_token() }}"
                 },
             dataType: "json",
 

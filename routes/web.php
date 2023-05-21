@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin-warranty-claim-done/{id}', 'WarrantyClaimInfoController@AdminWarrantyClaimDone');
     Route::get('/spo-invoice-claim-done/{id}', 'WarrantyClaimInfoController@SpoInvoiceClaimDone');
     Route::get('/admin-asking-parts-to-spo/{id}', 'WarrantyClaimInfoController@AdminAskingPartsToSpo');
+    Route::get('/warranty-claim-lock/{id}', 'WarrantyClaimInfoController@warrantyClaimLockUnlock')->name('warranty.claim.lock');
 
 });
 
