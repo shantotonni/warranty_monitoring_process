@@ -38,8 +38,7 @@ class UpdateServiceData extends Command
      */
     public function handle()
     {
-        DB::table('Role')->insert([
-            'Name' => 'Sentu',
-        ]);
+        $this->info(DB::table('Role')->get());
+        return 1;
     }
 }
