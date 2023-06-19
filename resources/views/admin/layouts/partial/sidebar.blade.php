@@ -20,6 +20,9 @@
                             <li>
                                 <a href="{{route('claim-warranty.index')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Warranty Claim</span></a>
                             </li>
+                            <li>
+                                <a href="{{route('inactive-claim-warranty.list')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Inactive Warranty Claim</span></a>
+                            </li>
                             <!-- <li>
                                 <a href="{{route('engineer-warranty-claims.index')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Engineer Warranty Claim</span></a>
                             </li> -->

@@ -34,6 +34,22 @@ class WarrantyClaimInfoController extends Controller
         return view('admin.warranty_claim_info.list', compact('warrantyClaims','inputs'));
     }
 
+    public function inactiveWarrentyClaimList()
+    {
+        $inputs = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>''];
+        $user = Auth::user();
+        // dd($user);
+        $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
+            if ($user->RoleId == 1) {
+                $query->where('SPOId', $user->Id);
+            } elseif ($user->RoleId == 3) {
+                $query->where('EngineerId', $user->Id);
+            }
+        })->orderBy('Id', 'desc')->where('Status','=','Inactive')->paginate(10);
+
+        return view('admin.warranty_claim_info.inactive_list', compact('warrantyClaims','inputs'));
+    }
+
     public function create()
     {
         $products = Product::all();

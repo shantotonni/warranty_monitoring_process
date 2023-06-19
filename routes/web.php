@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/spo-invoice-claim-done/{id}', 'WarrantyClaimInfoController@SpoInvoiceClaimDone');
     Route::get('/admin-asking-parts-to-spo/{id}', 'WarrantyClaimInfoController@AdminAskingPartsToSpo');
     Route::get('/warranty-claim-lock/{id}', 'WarrantyClaimInfoController@warrantyClaimLockUnlock')->name('warranty.claim.lock');
+    Route::get('inactive-claim-warranty-list', 'WarrantyClaimInfoController@inactiveWarrentyClaimList')->name('inactive-claim-warranty.list');
 
 });
 
