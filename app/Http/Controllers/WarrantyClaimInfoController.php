@@ -29,7 +29,7 @@ class WarrantyClaimInfoController extends Controller
             } elseif ($user->RoleId == 3) {
                 $query->where('EngineerId', $user->Id);
             }
-        })->orderBy('Id', 'desc')->paginate(10);
+        })->orderBy('Id', 'desc')->where('Status','!=','Inactive')->paginate(10);
 
         return view('admin.warranty_claim_info.list', compact('warrantyClaims','inputs'));
     }
@@ -193,10 +193,12 @@ class WarrantyClaimInfoController extends Controller
     public function destroy($id)
     {
         $warranty = WarrantyClaimInfo::findOrFail($id);
-        $warranty->parts()->delete();
-        $warranty->serviceDetail()->delete();
-        $warranty->documents()->delete();
-        $warranty->delete();
+        $warranty->Status = 'Inactive';
+        $warranty->save();
+        //$warranty->parts()->delete();
+        //$warranty->serviceDetail()->delete();
+        //$warranty->documents()->delete();
+        //$warranty->delete();
         return redirect(route('claim-warranty.index'))->with('success', 'Warranty Claim Info deleted successfully');
     }
 
