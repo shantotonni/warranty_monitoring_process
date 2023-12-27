@@ -20,7 +20,7 @@ class WarrantyClaimInfoController extends Controller
 {
     public function index()
     {
-        $inputs = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>''];
+        $inputs = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>'', 'CustomerCode'=>''];
         $user = Auth::user();
         // dd($user);
         $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
@@ -318,6 +318,7 @@ class WarrantyClaimInfoController extends Controller
     {
         $user = Auth::user();
         $inputs['ChassisNo'] = "";
+        $inputs['CustomerCode'] = "";
         $inputs['Status'] = "";
         $inputs['ProductId'] = "";
 
@@ -325,6 +326,11 @@ class WarrantyClaimInfoController extends Controller
             Session::put('ChassisNo', $request->ChassisNo);
         }
         $inputs['ChassisNo'] = Session::get('ChassisNo');
+
+        if($request->has('CustomerCode')){
+            Session::put('CustomerCode', $request->CustomerCode);
+        }
+        $inputs['CustomerCode'] = Session::get('CustomerCode');
 
         $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
             if ($user->RoleId == 1) {
@@ -334,9 +340,13 @@ class WarrantyClaimInfoController extends Controller
             }
         });
         if($inputs['ChassisNo'] != ""){
-            $warrantyClaims = $warrantyClaims->where('ChassisNumber', 'LIKE', '%'.Session::get('ChassisNo').'%')
-                                ->orderBy('Id', 'desc')->paginate(10);
+            $warrantyClaims = $warrantyClaims->where('ChassisNumber', 'LIKE', '%'.Session::get('ChassisNo').'%');
         }
+        if($inputs['CustomerCode'] != ""){
+            $warrantyClaims = $warrantyClaims->where('CustomerCode', 'LIKE', '%'.Session::get('CustomerCode').'%');
+        }
+
+        $warrantyClaims = $warrantyClaims->orderBy('Id', 'desc')->paginate(10);
 
         return view('admin.warranty_claim_info.list', compact('warrantyClaims', 'inputs'));
     }

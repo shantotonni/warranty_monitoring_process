@@ -35,7 +35,6 @@
 </div>
 <!-- /.content-header -->
 
-
 <!-- Main content -->
 <div class="container-fluid">
     <div class="row">
@@ -69,7 +68,7 @@
 
                     <!-- Search Forms -->
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-6">
                             <form action="{{route('search.warranty.claim.info.by.status')}}" method="GET">
                                 <div class="row">
                                     <div class="col-sm-5">
@@ -108,22 +107,30 @@
                             </form>
                         </div>
 
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <form action="{{route('search.warranty.claim.info.by.chassis.no')}}" method="GET">
                                 <div class="row">
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-4">
                                         <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
                                             <label for="ChassisNo">Search Chassis No.</label>
-                                            <input name="ChassisNo" type="text" class="form-control" value="{{$inputs['ChassisNo']}}" required placeholder="Enter Chassis No....">
+                                            <input name="ChassisNo" type="text" class="form-control" value="{{$inputs['ChassisNo']}}" placeholder="Enter Chassis No....">
                                             @if ($errors->has('ChassisNo'))
                                             <span class="help-block"><strong>{{ $errors->first('ChassisNo') }}</strong></span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
+                                            <label for="CustomerCode">Customer Code</label>
+                                            <input name="CustomerCode" type="text" class="form-control" value="{{$inputs['CustomerCode']}}" placeholder="Enter CustomerCode....">
+                                            @if ($errors->has('CustomerCode'))
+                                                <span class="help-block"><strong>{{ $errors->first('CustomerCode') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <button type="submit" class="btn btn-warning" style="margin-top: 30px;">Search</button>
                                     </div>
-
                                 </div>
                             </form>
                         </div>
@@ -131,7 +138,7 @@
 
                     <!-- Export form -->
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-6">
                             <form action="{{route('export.warranty.claim.info.table')}}" id="export_form" method="POST">
                                 @csrf
                                 <div class="row">
