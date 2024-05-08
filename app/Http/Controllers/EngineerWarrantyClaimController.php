@@ -35,7 +35,9 @@ class EngineerWarrantyClaimController extends Controller
 
     public function show($id)
     {
+
         $warranty = WarrantyClaimInfo::with('serviceDetail')->where('id', $id)->first();
+
         $serviceHisHeadings = ServiceHistory::with(['serviceDetail' => function ($query) use ($warranty) {
             $query->where('WarrantyClaimInfoId', $warranty->Id);
         }])->get();
@@ -52,6 +54,9 @@ class EngineerWarrantyClaimController extends Controller
         }
         if ($warranty->ProductId == "4") {
             return view('admin.engineer_warranty_claim.harvester_lovol_claim_warranty_show', compact('warranty'));
+        }
+        if ($warranty->ProductId == "5") {
+            return view('admin.engineer_warranty_claim.rotavator_claim_warranty_show', compact('warranty'));
         }
     }
 
@@ -70,11 +75,14 @@ class EngineerWarrantyClaimController extends Controller
         if ($warranty->ProductId == "4") {
             return view('admin.engineer_warranty_claim.harvester_lovol_claim_warranty', compact('warranty'));
         }
+        if ($warranty->ProductId == "5") {
+            return view('admin.engineer_warranty_claim.rotavator_claim_warranty', compact('warranty'));
+        }
     }
 
     public function update(Request $request, $id)
     {
-        
+
         if ($request->ProductId == 1) {
             DB::beginTransaction();
 
@@ -231,7 +239,7 @@ class EngineerWarrantyClaimController extends Controller
                 return $e;
             }
         }
-        
+
         if ($request->ProductId == 4) {
             // dd($request->all());
             DB::beginTransaction();
@@ -291,7 +299,7 @@ class EngineerWarrantyClaimController extends Controller
                                 'CreatedAt' => Carbon::now()
                             ]);
                         }
-                        
+
                     }
 
                     // insert supplier codes
@@ -302,7 +310,87 @@ class EngineerWarrantyClaimController extends Controller
                     for($i=0; $i < $countPartsCode; $i++){
                         $part = $partsCodes[$i];
                         $supplier = $supplierCodes[$i];
-                        DB::statement("UPDATE PartsDetail SET SupplierCode='$supplier' 
+                        DB::statement("UPDATE PartsDetail SET SupplierCode='$supplier'
+                            WHERE PartsNumber='$part' AND WarrantyclaiminfoId='$id'");
+                    }
+                    DB::commit();
+                }
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $e;
+            }
+        }
+
+        if ($request->ProductId == 5) {
+            DB::beginTransaction();
+
+            try {
+                $request->validate([
+                    'CustomerName' => 'required',
+                    'CustomerCode' => 'required',
+                    'CustomerNumber' => 'required',
+                    'ChassisNumber' => 'required',
+                    'Model' => 'required',
+                    'Upazila' => 'required',
+                    'EngineNo' => 'required',
+                    'DistrictName' => 'required',
+                    'DeliveryDate' => 'required',
+                    'WorkingHour' => 'required',
+                    'CustomerComplaint' => 'required',
+                    'SEAnalysis' => 'required',
+                    'FailureDate' => 'required',
+                    'FailureArea' => 'required',
+                    'RepairDate' => 'required',
+                    'WarrantyClaimDate' => 'required',
+                    'fileNames' => 'required',
+                ]);
+
+                $warranty = WarrantyClaimInfo::findOrFail($id);
+                $warranty->CustomerName = $request->CustomerName;
+                $warranty->CustomerCode = $request->CustomerCode;
+                $warranty->CustomerNumber = $request->CustomerNumber;
+                $warranty->ChassisNumber = $request->ChassisNumber;
+                $warranty->Model = $request->Model;
+                $warranty->Upazila = $request->Upazila;
+                $warranty->EngineNo = $request->EngineNo;
+                $warranty->DistrictName = $request->DistrictName;
+                $warranty->DeliveryDate = $request->DeliveryDate;
+                $warranty->WorkingHour = $request->WorkingHour;
+                $warranty->CustomerComplaint = $request->CustomerComplaint;
+                $warranty->SEAnalysis = $request->SEAnalysis;
+                $warranty->FailureDate = $request->FailureDate;
+                $warranty->FailureArea = $request->FailureArea;
+                $warranty->RepairDate = $request->RepairDate;
+                $warranty->WarrantyClaimDate = $request->WarrantyClaimDate;
+                $warranty->Status = "Submitted";
+                $warranty->UpdatedAt = Carbon::now();
+                $warranty->SubmittedTime = Carbon::now();
+
+                if ($warranty->save()) {
+                    if ($request->hasFile('fileNames')) {
+                        $files = $request->file('fileNames');
+                        foreach ($files as $file) {
+                            $filename = time() . rand() . '.' . $file->getClientOriginalExtension();
+                            $file->move(public_path('warranty_claim_image'), $filename);
+
+                            Document::create([
+                                'WarrantyClaimInfoId' => $warranty->Id,
+                                'Name' => $filename,
+                                'CreatedAt' => Carbon::now()
+                            ]);
+                        }
+
+                    }
+
+                    // insert supplier codes
+                    $partsCodes = $request->partsCode;
+                    $supplierCodes = $request->supplierCode;
+                    $countPartsCode = count($request->partsCode);
+                    // dd($partsCodes);
+                    for($i=0; $i < $countPartsCode; $i++){
+                        $part = $partsCodes[$i];
+                        $supplier = $supplierCodes[$i];
+                        DB::statement("UPDATE PartsDetail SET SupplierCode='$supplier'
                             WHERE PartsNumber='$part' AND WarrantyclaiminfoId='$id'");
                     }
                     DB::commit();

@@ -254,6 +254,7 @@ class WarrantyClaimInfoController extends Controller
         $inputs['Status'] = "";
         $inputs['ProductId'] = "";
         $inputs['ChassisNo'] = "";
+        $inputs['CustomerCode'] = "";
         // dd($inputs);
 
         if($request->has('Status')){
