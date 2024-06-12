@@ -59,7 +59,8 @@
                 <!-- /.card-header -->
                 <div class="card-body table-responsive">
                     <div>
-                        <p><strong  class="text-muted">Status Colors : </strong><span class="badge badge-pill badge-primary" style="background-color: #ff9999;">Pending</span>
+                        <p>
+                            <strong  class="text-muted">Status Colors : </strong><span class="badge badge-pill badge-primary" style="background-color: #ff9999;">Pending</span>
                             <span class="badge badge-pill badge-primary" style="background-color: #D7DF23;">Submitted</span>
                             <span class="badge badge-pill badge-primary" style="background-color: #50D20B;">Approved</span>
                             <span class="badge badge-pill badge-primary" style="background-color: #3FC6EE;">Asking Parts</span>
@@ -68,31 +69,32 @@
 
                     <!-- Search Forms -->
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <form action="{{route('search.warranty.claim.info.by.status')}}" method="GET">
                                 <div class="row">
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-2">
                                         <div class="form-group{{ $errors->has('Status') ? 'has-error' : '' }}">
                                             <label for="Status">Search by Status</label>
                                             <select name="Status" data-live-search="true" class="form-control select2" style="width: 100%;" type="select">
                                                 <option value="">Select a Status</option>
-                                                <option value="Pending" @if($inputs['Status']=="Pending" ){{'selected'}}@endif>Pending</option>
-                                                <option value="Submitted" @if($inputs['Status']=="Submitted" ){{'selected'}}@endif>Submitted</option>
-                                                <option value="Approved" @if($inputs['Status']=="Approved" ){{'selected'}}@endif>Approved</option>
+                                                <option value="Pending" @if($data['Status']=="Pending" ){{'selected'}}@endif>Pending</option>
+                                                <option value="Submitted" @if($data['Status']=="Submitted" ){{'selected'}}@endif>Submitted</option>
+                                                <option value="Approved" @if($data['Status']=="Approved" ){{'selected'}}@endif>Approved</option>
                                             </select>
                                             @if ($errors->has('Status'))
                                             <span class="help-block"><strong>{{ $errors->first('Status') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-2">
                                         <div class="form-group{{ $errors->has('ProductId') ? 'has-error' : '' }}">
                                             <label for="ProductId">Search by Product</label>
                                             <select name="ProductId" data-live-search="true" class="form-control select2" style="width: 100%;" type="select">
                                                 <option value="">Select a Product</option>
-                                                <option value="1" @if($inputs['ProductId']=="1" ){{'selected'}}@endif>Tractor</option>
-                                                <option value="2" @if($inputs['ProductId']=="2" ){{'selected'}}@endif>Harvester</option>
-                                                <option value="4" @if($inputs['ProductId']=="4" ){{'selected'}}@endif>Harvester (Lovol)</option>
+                                                <option value="1" @if($data['ProductId']=="1" ){{'selected'}}@endif>Tractor</option>
+                                                <option value="2" @if($data['ProductId']=="2" ){{'selected'}}@endif>Harvester</option>
+                                                <option value="4" @if($data['ProductId']=="4" ){{'selected'}}@endif>Harvester (Lovol)</option>
+                                                <option value="5" @if($data['ProductId']=="5" ){{'selected'}}@endif>Rotavator</option>
                                             </select>
                                             @if ($errors->has('ProductId'))
                                             <span class="help-block"><strong>{{ $errors->first('ProductId') }}</strong></span>
@@ -100,73 +102,110 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
-                                        <button type="submit" class="btn btn-info" style="margin-top: 30px;">Search</button>
-                                    </div>
-
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <form action="{{route('search.warranty.claim.info.by.chassis.no')}}" method="GET">
-                                <div class="row">
-                                    <div class="col-sm-4">
                                         <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
                                             <label for="ChassisNo">Search Chassis No.</label>
-                                            <input name="ChassisNo" type="text" class="form-control" value="{{$inputs['ChassisNo']}}" placeholder="Enter Chassis No....">
+                                            <input name="ChassisNo" type="text" class="form-control" value="{{$data['ChassisNo']}}" placeholder="Enter Chassis No....">
                                             @if ($errors->has('ChassisNo'))
-                                            <span class="help-block"><strong>{{ $errors->first('ChassisNo') }}</strong></span>
+                                                <span class="help-block"><strong>{{ $errors->first('ChassisNo') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-2">
                                         <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
                                             <label for="CustomerCode">Customer Code</label>
-                                            <input name="CustomerCode" type="text" class="form-control" value="{{$inputs['CustomerCode']}}" placeholder="Enter CustomerCode....">
+                                            <input name="CustomerCode" type="text" class="form-control" value="{{$data['CustomerCode']}}" placeholder="Enter CustomerCode....">
                                             @if ($errors->has('CustomerCode'))
                                                 <span class="help-block"><strong>{{ $errors->first('CustomerCode') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-sm-2">
-                                        <button type="submit" class="btn btn-warning" style="margin-top: 30px;">Search</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Export form -->
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <form action="{{route('export.warranty.claim.info.table')}}" id="export_form" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-1">
                                         <div class="form-group {{ $errors->has('date_from') ? 'has-error' : '' }}">
                                             <label for="date_from">Date From</label>
-                                            <input name="date_from" type="text" id="date_from" class="form-control" value="" required autocomplete="off" placeholder="Enter Date From">
+                                            <input name="date_from" type="text" id="date_from" class="form-control" value="{{$data['date_from']}}" autocomplete="off" placeholder="From Date">
                                             @if ($errors->has('date_from'))
-                                            <span class="help-block"><strong>{{ $errors->first('date_from') }}</strong></span>
+                                                <span class="help-block"><strong>{{ $errors->first('date_from') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-1">
                                         <div class="form-group {{ $errors->has('date_to') ? 'has-error' : '' }}">
                                             <label for="date_to">Date To</label>
-                                            <input name="date_to" type="text" id="date_to" class="form-control" value="" required autocomplete="off" placeholder="Enter Date To">
+                                            <input name="date_to" type="text" id="date_to" class="form-control" value="{{$data['date_to']}}" autocomplete="off" placeholder="To Date">
                                             @if ($errors->has('date_to'))
-                                            <span class="help-block"><strong>{{ $errors->first('date_to') }}</strong></span>
+                                                <span class="help-block"><strong>{{ $errors->first('date_to') }}</strong></span>
                                             @endif
                                         </div>
                                     </div>
+
                                     <div class="col-sm-2">
-                                        <button type="submit" class="btn btn-success" id="export_btn" style="margin-top: 30px;">Export</button>
+                                        <button type="submit" class="btn btn-info" style="margin-top: 30px;">Search</button>
+                                        <button type="submit" class="btn btn-success" name="export" value="Y" id="export_btn" style="margin-top: 30px;">Export</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    </div>
+
+{{--                        <div class="col-lg-6">--}}
+{{--                            <form action="{{route('search.warranty.claim.info.by.chassis.no')}}" method="GET">--}}
+{{--                                <div class="row">--}}
+{{--                                    <div class="col-sm-4">--}}
+{{--                                        <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">--}}
+{{--                                            <label for="ChassisNo">Search Chassis No.</label>--}}
+{{--                                            <input name="ChassisNo" type="text" class="form-control" value="{{$inputs['ChassisNo']}}" placeholder="Enter Chassis No....">--}}
+{{--                                            @if ($errors->has('ChassisNo'))--}}
+{{--                                            <span class="help-block"><strong>{{ $errors->first('ChassisNo') }}</strong></span>--}}
+{{--                                            @endif--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="col-sm-4">--}}
+{{--                                        <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">--}}
+{{--                                            <label for="CustomerCode">Customer Code</label>--}}
+{{--                                            <input name="CustomerCode" type="text" class="form-control" value="{{$inputs['CustomerCode']}}" placeholder="Enter CustomerCode....">--}}
+{{--                                            @if ($errors->has('CustomerCode'))--}}
+{{--                                                <span class="help-block"><strong>{{ $errors->first('CustomerCode') }}</strong></span>--}}
+{{--                                            @endif--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="col-sm-2">--}}
+{{--                                        <button type="submit" class="btn btn-warning" style="margin-top: 30px;">Search</button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </form>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+
+                    <!-- Export form -->
+{{--                    <div class="row">--}}
+{{--                        <div class="col-lg-6">--}}
+{{--                            <form action="{{route('export.warranty.claim.info.table')}}" id="export_form" method="POST">--}}
+{{--                                @csrf--}}
+{{--                                <div class="row">--}}
+{{--                                    <div class="col-sm-5">--}}
+{{--                                        <div class="form-group {{ $errors->has('date_from') ? 'has-error' : '' }}">--}}
+{{--                                            <label for="date_from">Date From</label>--}}
+{{--                                            <input name="date_from" type="text" id="date_from" class="form-control" value="" required autocomplete="off" placeholder="Enter Date From">--}}
+{{--                                            @if ($errors->has('date_from'))--}}
+{{--                                            <span class="help-block"><strong>{{ $errors->first('date_from') }}</strong></span>--}}
+{{--                                            @endif--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="col-sm-5">--}}
+{{--                                        <div class="form-group {{ $errors->has('date_to') ? 'has-error' : '' }}">--}}
+{{--                                            <label for="date_to">Date To</label>--}}
+{{--                                            <input name="date_to" type="text" id="date_to" class="form-control" value="" required autocomplete="off" placeholder="Enter Date To">--}}
+{{--                                            @if ($errors->has('date_to'))--}}
+{{--                                            <span class="help-block"><strong>{{ $errors->first('date_to') }}</strong></span>--}}
+{{--                                            @endif--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="col-sm-2">--}}
+{{--                                        <button type="submit" class="btn btn-success" id="export_btn" style="margin-top: 30px;">Export</button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </form>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
 
                     <table id="table_id" class="table table-bordered table-striped table-sm small text-nowrap display" style="width:100%">

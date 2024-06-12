@@ -20,9 +20,8 @@ class WarrantyClaimInfoController extends Controller
 {
     public function index()
     {
-        $inputs = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>'', 'CustomerCode'=>''];
+        $data = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>'', 'CustomerCode'=>'','date_from'=>'','date_to'=>''];
         $user = Auth::user();
-        // dd($user);
         $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
             if ($user->RoleId == 1) {
                 $query->where('SPOId', $user->Id);
@@ -31,7 +30,7 @@ class WarrantyClaimInfoController extends Controller
             }
         })->orderBy('Id', 'desc')->where('Status','!=','Inactive')->paginate(10);
 
-        return view('admin.warranty_claim_info.list', compact('warrantyClaims','inputs'));
+        return view('admin.warranty_claim_info.list', compact('warrantyClaims','data'));
     }
 
     public function inactiveWarrentyClaimList()
@@ -120,8 +119,15 @@ class WarrantyClaimInfoController extends Controller
         // $replacedNumber = "01322 901274";
         $mobileno = str_replace(" ","",$replacedNumber);
 
-        $respons = $this->sendsms($ip = '192.168.100.213', $userid = 'motors', $password = 'Asdf1234', $smstext = urlencode($smscontent), $receipient = urlencode($mobileno));
-
+        $to = $mobileno;
+        $sId = '8809617615000';
+        $applicationName = 'Motors Service';
+        $moduleName = 'Warranty Claim';
+        $otherInfo = 'W';
+        $userId = Auth::user()->Id;
+        $vendor = 'smsq';
+        $message = $smscontent;
+        $message = $this->sendSmsQ($to, $sId, $applicationName, $moduleName, $otherInfo, $userId, $vendor, $message);
 
         return redirect(route('claim-warranty.index'))->with('success', 'Warranty Claim info created successfully');
     }
@@ -199,9 +205,15 @@ class WarrantyClaimInfoController extends Controller
         // $replacedNumber = "01322 901274";
         $mobileno = str_replace(" ","",$replacedNumber);
 
-        $respons = $this->sendsms($ip = '192.168.100.213', $userid = 'motors', $password = 'Asdf1234', $smstext = urlencode($smscontent), $receipient = urlencode($mobileno));
-
-
+        $to = $mobileno;
+        $sId = '8809617615000';
+        $applicationName = 'Motors Service';
+        $moduleName = 'Warranty Claim';
+        $otherInfo = 'W';
+        $userId = Auth::user()->Id;
+        $vendor = 'smsq';
+        $message = $smscontent;
+        $message = $this->sendSmsQ($to, $sId, $applicationName, $moduleName, $otherInfo, $userId, $vendor, $message);
 
         return redirect(route('claim-warranty.index'))->with('success', 'Warranty Claim info updated successfully');
     }
@@ -251,87 +263,118 @@ class WarrantyClaimInfoController extends Controller
     public function searchWarrantyClaimInfoByStatus(Request $request)
     {
         $user = Auth::user();
-        $inputs['Status'] = "";
-        $inputs['ProductId'] = "";
-        $inputs['ChassisNo'] = "";
-        $inputs['CustomerCode'] = "";
-        // dd($inputs);
+        $data = [];
+        $data['ChassisNo'] = $request->ChassisNo;
+        $data['CustomerCode'] = $request->CustomerCode;
+        $data['Status'] = $request->Status;
+        $data['ProductId'] = $request->ProductId;
+        $data['date_from'] = $request->date_from;
+        $data['date_to'] = $request->date_to;
 
-        if($request->has('Status')){
-            Session::put('Status', $request->Status);
-            Session::put('ProductId', $request->ProductId);
-        }
-        $inputs['Status'] = Session::get('Status');
-        $inputs['ProductId'] = Session::get('ProductId');
-        // dd(Session::get('Status'));
-        $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
+        $warrantyClaims = WarrantyClaimInfo::query()->where(function ($query) use ($user) {
             if ($user->RoleId == 1) {
                 $query->where('SPOId', $user->Id);
             } elseif ($user->RoleId == 3) {
                 $query->where('EngineerId', $user->Id);
             }
         });
-        if($inputs['Status'] != "" && $inputs['ProductId'] != ""){
-            $warrantyClaims = $warrantyClaims->where('Status', Session::get('Status'))
-                                ->where('ProductId', Session::get('ProductId'))
-                                ->orderBy('Id', 'desc')->paginate(10);
+
+        if($data['Status']){
+            $warrantyClaims = $warrantyClaims->where('Status', $data['Status']);
         }
-        if($inputs['Status'] != "" && $inputs['ProductId'] == ""){
-            $warrantyClaims = $warrantyClaims->where('Status', Session::get('Status'))
-                                ->orderBy('Id', 'desc')->paginate(10);
+        if ($data['ProductId']){
+            $warrantyClaims = $warrantyClaims->where('ProductId', $data['ProductId']);
         }
-        if($inputs['Status'] == "" && $inputs['ProductId'] != ""){
-            $warrantyClaims = $warrantyClaims->where('ProductId', Session::get('ProductId'))
-                                ->orderBy('Id', 'desc')->paginate(10);
+        if ($data['ChassisNo']){
+            $warrantyClaims = $warrantyClaims->where('ChassisNumber', 'LIKE', '%'.$data['ChassisNo'].'%');
         }
-        if($inputs['Status'] == "" && $inputs['ProductId'] == ""){
-            $warrantyClaims = $warrantyClaims->orderBy('Id', 'desc')->paginate(10);
+        if ($data['CustomerCode']){
+            $warrantyClaims = $warrantyClaims->where('CustomerCode', 'LIKE', '%'.$data['CustomerCode'].'%');
+        }
+        if ($data['date_from'] && $data['date_to']){
+            $warrantyClaims = $warrantyClaims->whereBetween('CreatedAt', [$data['date_from'],$data['date_to']]);
         }
 
-        return view('admin.warranty_claim_info.list', compact('warrantyClaims', 'inputs'));
+        if ($request->export != 'Y'){
+            $warrantyClaims = $warrantyClaims->orderBy('Id', 'desc')->paginate(10);
+        }else{
+            $result = [];
+            $partsDetails = PartsDetail::whereHas('warranty_claim', function ($query) use ($data) {
+                $query->whereDate('CreatedAt', '>=', $data['date_from']);
+                $query->whereDate('CreatedAt', '<=', $data['date_to']);
+                if ($data['Status']){
+                    $query->where('Status',$data['Status']);
+                }
+                if ($data['ProductId']){
+                    $query->where('ProductId',$data['ProductId']);
+                }
+
+            })->with('warranty_claim')->get();
+
+            foreach ($partsDetails as $parts) {
+                $result[] = [
+                    'Id' => $parts->Id,
+                    'Product' => $parts->warranty_claim->product->Name,
+                    'Engineer' => $parts->warranty_claim->engineer->Name,
+                    'SPO' => $parts->warranty_claim->spo->Name,
+                    'Purpose' => $parts->warranty_claim->Purpose,
+                    'DeliveryDate' => $parts->warranty_claim->DeliveryDate,
+                    'CustomerCode' => $parts->warranty_claim->CustomerCode,
+                    'CustomerName' => $parts->warranty_claim->CustomerName,
+                    'CustomerNumber' => $parts->warranty_claim->CustomerNumber,
+                    'ChassisNumber' => $parts->warranty_claim->ChassisNumber,
+                    'PartsCode' => $parts->PartsNumber,
+                    'PartsName' => $parts->PartsName,
+                    'Quantity' => $parts->Quantity,
+                    'Price' => $parts->Price,
+                    'Status' => $parts->warranty_claim->Status,
+                    'PendingTime' => $parts->warranty_claim->CreatedAt,
+                    'SubmittedTime' => $parts->warranty_claim->SubmittedTime,
+                    'ApprovedTime' => $parts->warranty_claim->ApprovedTime
+                ];
+            }
+
+            $this->exportexcel($result,'Warranty');
+
+        }
+
+        return view('admin.warranty_claim_info.list', compact('warrantyClaims', 'data'));
     }
 
-    // public function searchWarrantyClaimInfoByProduct(Request $request)
-    // {
-    //     $user = Auth::user();
-    //     $productId = $request->ProductId;
-    //     $inputs['ProductId'] = "";
-    //     $inputs['Status'] = "";
-    //     // dd($inputs);
+    public function exportexcel($result,$filename){
+        for($i=0; $i<count($result); $i++){
+            unset($result[$i]['PageNo']);
+        }
 
-    //     if($request->has('ProductId')){
-    //         Session::put('ProductId', $request->ProductId);
-    //     }
-    //     $inputs['ProductId'] = Session::get('ProductId');
-    //     // dd(Session::get('ProductId'));
-    //     $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
-    //         if ($user->RoleId == 1) {
-    //             $query->where('SPOId', $user->Id);
-    //         } elseif ($user->RoleId == 3) {
-    //             $query->where('EngineerId', $user->Id);
-    //         }
-    //     })->where('ProductId', Session::get('ProductId'))->orderBy('Id', 'desc')->paginate(10);
+        $arrayheading[0] = array_keys($result[0]);
+        $result = array_merge($arrayheading, $result);
 
-    //     return view('admin.warranty_claim_info.list', compact('warrantyClaims', 'inputs'));
-    // }
+        header("Content-Disposition: attachment; filename=\"{$filename}.xls\"");
+        header("Content-Type: application/vnd.ms-excel;");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        $out = fopen("php://output", 'w');
+        fputs( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM !!!!!
+
+        foreach ($result as $data)
+        {
+            fputcsv($out, $data);
+        }
+
+        fclose($out);
+        exit();
+    }
 
     public function searchWarrantyClaimInfoByChassisNo(Request $request)
     {
         $user = Auth::user();
-        $inputs['ChassisNo'] = "";
-        $inputs['CustomerCode'] = "";
-        $inputs['Status'] = "";
-        $inputs['ProductId'] = "";
-
-        if($request->has('ChassisNo')){
-            Session::put('ChassisNo', $request->ChassisNo);
-        }
-        $inputs['ChassisNo'] = Session::get('ChassisNo');
-
-        if($request->has('CustomerCode')){
-            Session::put('CustomerCode', $request->CustomerCode);
-        }
-        $inputs['CustomerCode'] = Session::get('CustomerCode');
+        $data = [];
+        $data['ChassisNo'] = $request->ChassisNo;
+        $data['CustomerCode'] = $request->CustomerCode;
+        $data['Status'] = $request->Status;
+        $data['ProductId'] = $request->ProductId;
+        $data['date_from'] = $request->date_from;
+        $data['date_to'] = $request->date_to;
 
         $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
             if ($user->RoleId == 1) {
@@ -393,5 +436,30 @@ class WarrantyClaimInfoController extends Controller
         $response = file_get_contents($smsUrl);
         //print_r($response); exit();
         return json_decode($response);
+    }
+
+    public static function sendSmsQ($to, $sId, $applicationName, $moduleName, $otherInfo, $userId, $vendor, $message)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://192.168.102.10/apps/api/send-sms/sms-master',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => 'To='.$to.'&SID='.$sId.'&ApplicationName='.urlencode($applicationName).'&ModuleName='.urlencode($moduleName).'&OtherInfo='.urlencode($otherInfo).'&userID='.$userId.'&Message='.$message.'&SmsVendor='.$vendor,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/x-www-form-urlencoded'
+            ),
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        ));
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
     }
 }

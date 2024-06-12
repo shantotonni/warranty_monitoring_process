@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/export-warranty-claim-info-list', [App\Http\Controllers\WarrantyClaimInfoController::class, 'exportWarrantyClaimInfoTable'])->name('export.warranty.claim.info.table');
     Route::get('/search-warranty-claim-info-by-status', [App\Http\Controllers\WarrantyClaimInfoController::class, 'searchWarrantyClaimInfoByStatus'])->name('search.warranty.claim.info.by.status');
-    Route::get('/search-warranty-claim-info-by-chassis-no', [App\Http\Controllers\WarrantyClaimInfoController::class, 'searchWarrantyClaimInfoByChassisNo'])->name('search.warranty.claim.info.by.chassis.no');
+    //Route::get('/search-warranty-claim-info-by-chassis-no', [App\Http\Controllers\WarrantyClaimInfoController::class, 'searchWarrantyClaimInfoByChassisNo'])->name('search.warranty.claim.info.by.chassis.no');
     // Route::get('/search-warranty-claim-info-by-product', [App\Http\Controllers\WarrantyClaimInfoController::class, 'searchWarrantyClaimInfoByProduct'])->name('search.warranty.claim.info.by.product');
     Route::get('/admin-warranty-claim-done/{id}', 'WarrantyClaimInfoController@AdminWarrantyClaimDone');
     Route::get('/spo-invoice-claim-done/{id}', 'WarrantyClaimInfoController@SpoInvoiceClaimDone');
