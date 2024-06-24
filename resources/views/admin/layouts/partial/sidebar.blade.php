@@ -18,7 +18,7 @@
                                 <a href="{{route('admin-dashboard.index')}}" class="waves-effect"><i class="ti-gift"></i><span>Admin Dashboard</span></a>
                             </li> -->
                             <li>
-                                <a href="{{route('claim-warranty.index')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Warranty Claim</span></a>
+                                <a href="{{route('claim-warranty.index')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Claim</span></a>
                             </li>
                             <li>
                                 <a href="{{route('inactive-claim-warranty.list')}}" class="waves-effect"><i class="ti-shopping-cart"></i><span>Inactive Warranty Claim</span></a>

@@ -70,11 +70,11 @@
                     <!-- Search Forms -->
                     <div class="row">
                         <div class="col-lg-12">
-                            <form action="{{route('search.warranty.claim.info.by.status')}}" method="GET">
+                            <form action="{{route('claim-warranty.index')}}" method="GET">
                                 <div class="row">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-1">
                                         <div class="form-group{{ $errors->has('Status') ? 'has-error' : '' }}">
-                                            <label for="Status">Search by Status</label>
+                                            <label for="Status">Status</label>
                                             <select name="Status" data-live-search="true" class="form-control select2" style="width: 100%;" type="select">
                                                 <option value="">Select a Status</option>
                                                 <option value="Pending" @if($data['Status']=="Pending" ){{'selected'}}@endif>Pending</option>
@@ -101,6 +101,19 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div class="col-sm-1">
+                                        <div class="form-group{{ $errors->has('Purpose') ? 'has-error' : '' }}">
+                                            <label for="Purpose">Purpose</label>
+                                            <select name="Purpose" data-live-search="true" class="form-control select2" style="width: 100%;" type="select">
+                                                <option value="">Purpose</option>
+                                                <option value="Warranty" @if($data['Purpose']=="Warranty" ){{'selected'}}@endif>Warranty</option>
+                                                <option value="Goodwill" @if($data['Purpose']=="Goodwill" ){{'selected'}}@endif>Goodwill</option>
+                                            </select>
+                                            @if ($errors->has('ProductId'))
+                                                <span class="help-block"><strong>{{ $errors->first('ProductId') }}</strong></span>
+                                            @endif
+                                        </div>
+                                    </div>
                                     <div class="col-sm-2">
                                         <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
                                             <label for="ChassisNo">Search Chassis No.</label>
@@ -110,10 +123,10 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-1">
                                         <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">
                                             <label for="CustomerCode">Customer Code</label>
-                                            <input name="CustomerCode" type="text" class="form-control" value="{{$data['CustomerCode']}}" placeholder="Enter CustomerCode....">
+                                            <input name="CustomerCode" type="text" class="form-control" value="{{$data['CustomerCode']}}" placeholder="Customer Code....">
                                             @if ($errors->has('CustomerCode'))
                                                 <span class="help-block"><strong>{{ $errors->first('CustomerCode') }}</strong></span>
                                             @endif
@@ -145,68 +158,6 @@
                                 </div>
                             </form>
                         </div>
-
-{{--                        <div class="col-lg-6">--}}
-{{--                            <form action="{{route('search.warranty.claim.info.by.chassis.no')}}" method="GET">--}}
-{{--                                <div class="row">--}}
-{{--                                    <div class="col-sm-4">--}}
-{{--                                        <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">--}}
-{{--                                            <label for="ChassisNo">Search Chassis No.</label>--}}
-{{--                                            <input name="ChassisNo" type="text" class="form-control" value="{{$inputs['ChassisNo']}}" placeholder="Enter Chassis No....">--}}
-{{--                                            @if ($errors->has('ChassisNo'))--}}
-{{--                                            <span class="help-block"><strong>{{ $errors->first('ChassisNo') }}</strong></span>--}}
-{{--                                            @endif--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="col-sm-4">--}}
-{{--                                        <div class="form-group{{ $errors->has('ChassisNo') ? 'has-error' : '' }}">--}}
-{{--                                            <label for="CustomerCode">Customer Code</label>--}}
-{{--                                            <input name="CustomerCode" type="text" class="form-control" value="{{$inputs['CustomerCode']}}" placeholder="Enter CustomerCode....">--}}
-{{--                                            @if ($errors->has('CustomerCode'))--}}
-{{--                                                <span class="help-block"><strong>{{ $errors->first('CustomerCode') }}</strong></span>--}}
-{{--                                            @endif--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="col-sm-2">--}}
-{{--                                        <button type="submit" class="btn btn-warning" style="margin-top: 30px;">Search</button>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </form>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
-                    <!-- Export form -->
-{{--                    <div class="row">--}}
-{{--                        <div class="col-lg-6">--}}
-{{--                            <form action="{{route('export.warranty.claim.info.table')}}" id="export_form" method="POST">--}}
-{{--                                @csrf--}}
-{{--                                <div class="row">--}}
-{{--                                    <div class="col-sm-5">--}}
-{{--                                        <div class="form-group {{ $errors->has('date_from') ? 'has-error' : '' }}">--}}
-{{--                                            <label for="date_from">Date From</label>--}}
-{{--                                            <input name="date_from" type="text" id="date_from" class="form-control" value="" required autocomplete="off" placeholder="Enter Date From">--}}
-{{--                                            @if ($errors->has('date_from'))--}}
-{{--                                            <span class="help-block"><strong>{{ $errors->first('date_from') }}</strong></span>--}}
-{{--                                            @endif--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="col-sm-5">--}}
-{{--                                        <div class="form-group {{ $errors->has('date_to') ? 'has-error' : '' }}">--}}
-{{--                                            <label for="date_to">Date To</label>--}}
-{{--                                            <input name="date_to" type="text" id="date_to" class="form-control" value="" required autocomplete="off" placeholder="Enter Date To">--}}
-{{--                                            @if ($errors->has('date_to'))--}}
-{{--                                            <span class="help-block"><strong>{{ $errors->first('date_to') }}</strong></span>--}}
-{{--                                            @endif--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="col-sm-2">--}}
-{{--                                        <button type="submit" class="btn btn-success" id="export_btn" style="margin-top: 30px;">Export</button>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </form>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
 
                     <table id="table_id" class="table table-bordered table-striped table-sm small text-nowrap display" style="width:100%">
                         <thead style="background-color: #5B627E;color:white;">
@@ -475,7 +426,7 @@
 
                 </div>
                 <!-- /.card-body -->
-                <div class="d-flex justify-content-end mt-1">{{ $warrantyClaims->links() }}</div>
+                <div class="d-flex justify-content-end mt-1">{{ $warrantyClaims->withQueryString()->links() }}</div>
             </div>
             <!-- /.card -->
         </div>

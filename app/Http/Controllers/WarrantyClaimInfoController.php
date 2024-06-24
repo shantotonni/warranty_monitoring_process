@@ -18,17 +18,89 @@ use DB;
 
 class WarrantyClaimInfoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = ['Status'=>"", 'ProductId'=>"", 'ChassisNo'=>'', 'CustomerCode'=>'','date_from'=>'','date_to'=>''];
         $user = Auth::user();
-        $warrantyClaims = WarrantyClaimInfo::where(function ($query) use ($user) {
+        $data = [];
+        $data['ChassisNo'] = $request->ChassisNo;
+        $data['CustomerCode'] = $request->CustomerCode;
+        $data['Status'] = $request->Status;
+        $data['Purpose'] = $request->Purpose;
+        $data['ProductId'] = $request->ProductId;
+        $data['date_from'] = $request->date_from;
+        $data['date_to'] = $request->date_to;
+
+        $warrantyClaims = WarrantyClaimInfo::query()->where(function ($query) use ($user) {
             if ($user->RoleId == 1) {
                 $query->where('SPOId', $user->Id);
             } elseif ($user->RoleId == 3) {
                 $query->where('EngineerId', $user->Id);
             }
-        })->orderBy('Id', 'desc')->where('Status','!=','Inactive')->paginate(10);
+        })->where('Status','!=','Inactive');
+
+        if($data['Status']){
+            $warrantyClaims = $warrantyClaims->where('Status', $data['Status']);
+        }
+        if ($data['ProductId']){
+            $warrantyClaims = $warrantyClaims->where('ProductId', $data['ProductId']);
+        }
+        if ($data['Purpose']){
+            $warrantyClaims = $warrantyClaims->where('Purpose', $data['Purpose']);
+        }
+        if ($data['ChassisNo']){
+            $warrantyClaims = $warrantyClaims->where('ChassisNumber', 'LIKE', '%'.$data['ChassisNo'].'%');
+        }
+        if ($data['CustomerCode']){
+            $warrantyClaims = $warrantyClaims->where('CustomerCode', 'LIKE', '%'.$data['CustomerCode'].'%');
+        }
+        if ($data['date_from'] && $data['date_to']){
+            $warrantyClaims = $warrantyClaims->whereBetween('CreatedAt', [$data['date_from'],$data['date_to']]);
+        }
+
+        if ($request->export != 'Y'){
+            $warrantyClaims = $warrantyClaims->orderBy('Id', 'desc')->paginate(10);
+            $warrantyClaims->appends($request->all());
+        }else{
+
+            $result = [];
+            $partsDetails = PartsDetail::whereHas('warranty_claim', function ($query) use ($data) {
+                if ($data['date_from'] && $data['date_to']){
+                    $query->whereDate('CreatedAt', '>=', $data['date_from']);
+                    $query->whereDate('CreatedAt', '<=', $data['date_to']);
+                }
+                if ($data['Status']){
+                    $query->where('Status',$data['Status']);
+                }
+                if ($data['ProductId']){
+                    $query->where('ProductId',$data['ProductId']);
+                }
+            })->get();
+
+            foreach ($partsDetails as $parts) {
+                $result[] = [
+                    'Id' => $parts->Id,
+                    'Product' => $parts->warranty_claim->product->Name,
+                    'Engineer' => $parts->warranty_claim->engineer->Name,
+                    'SPO' => $parts->warranty_claim->spo->Name,
+                    'Purpose' => $parts->warranty_claim->Purpose,
+                    'DeliveryDate' => $parts->warranty_claim->DeliveryDate,
+                    'CustomerCode' => $parts->warranty_claim->CustomerCode,
+                    'CustomerName' => $parts->warranty_claim->CustomerName,
+                    'CustomerNumber' => $parts->warranty_claim->CustomerNumber,
+                    'ChassisNumber' => $parts->warranty_claim->ChassisNumber,
+                    'PartsCode' => $parts->PartsNumber,
+                    'PartsName' => $parts->PartsName,
+                    'Quantity' => $parts->Quantity,
+                    'Price' => $parts->Price,
+                    'Status' => $parts->warranty_claim->Status,
+                    'PendingTime' => $parts->warranty_claim->CreatedAt,
+                    'SubmittedTime' => $parts->warranty_claim->SubmittedTime,
+                    'ApprovedTime' => $parts->warranty_claim->ApprovedTime
+                ];
+            }
+
+            $this->exportexcel($result,'Warranty');
+        }
 
         return view('admin.warranty_claim_info.list', compact('warrantyClaims','data'));
     }

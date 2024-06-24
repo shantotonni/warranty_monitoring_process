@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/areas', 'AreaController');
     Route::resource('/user-areas', 'UserAreaController');
     Route::resource('/claim-warranty', 'WarrantyClaimInfoController');
+    Route::post('warranty_report', 'WarrantyClaimInfoController@demo')->name('warranty_report');
     Route::post('/unlock-engineer-warranty-btn', 'WarrantyClaimInfoController@unlockEngineerWarrantyBtn')->name('unlock.engineer.warranty.submit.btn');
     Route::get('/parts', 'PartsController@index')->name('parts.index');
     Route::get('/parts/create', 'PartsController@create');
