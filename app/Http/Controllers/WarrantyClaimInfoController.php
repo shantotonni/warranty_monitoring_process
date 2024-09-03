@@ -61,7 +61,6 @@ class WarrantyClaimInfoController extends Controller
             $warrantyClaims = $warrantyClaims->orderBy('Id', 'desc')->paginate(10);
             $warrantyClaims->appends($request->all());
         }else{
-
             $result = [];
             $partsDetails = PartsDetail::whereHas('warranty_claim', function ($query) use ($data) {
                 if ($data['date_from'] && $data['date_to']){
@@ -95,7 +94,16 @@ class WarrantyClaimInfoController extends Controller
                     'Status' => $parts->warranty_claim->Status,
                     'PendingTime' => $parts->warranty_claim->CreatedAt,
                     'SubmittedTime' => $parts->warranty_claim->SubmittedTime,
-                    'ApprovedTime' => $parts->warranty_claim->ApprovedTime
+                    'ApprovedTime' => $parts->warranty_claim->ApprovedTime,
+                    'WorkingHour' => $parts->warranty_claim->WorkingHour,
+                    'DateOfComplaint' => $parts->warranty_claim->DateOfComplaint,
+                    'FailureDate' => $parts->warranty_claim->FailureDate,
+                    'MQRDate' => $parts->warranty_claim->MQRDate,
+                    'DateOfRepair' => $parts->warranty_claim->DateOfRepair,
+                    'RepairDate' => $parts->warranty_claim->RepairDate,
+                    'JobCardDate' => $parts->warranty_claim->JobCardDate,
+                    'WarrantyClaimDate' => $parts->warranty_claim->WarrantyClaimDate,
+                    'WarrantyNumber' => 'HAR/WRT/'.$parts->warranty_claim->Id,
                 ];
             }
 
@@ -136,8 +144,6 @@ class WarrantyClaimInfoController extends Controller
 
     public function store(Request $request)
     {
-        // return $request->all();
-
         $request->validate([
             'ProductId' => 'required',
             'EngineerId' => 'required',
