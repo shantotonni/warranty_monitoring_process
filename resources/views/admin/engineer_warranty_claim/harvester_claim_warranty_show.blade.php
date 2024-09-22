@@ -213,12 +213,12 @@
                         <div class="col-sm-3 text-center">
                             <p class="pb-2" style="margin-bottom: 132px;"><strong>Checked By</strong></p>
                             <hr>
-                            <p><strong>SCE/Sr.SCE/AMS</strong></p>
+                            <p><strong>DM, Service</strong></p>
                         </div>
                         <div class="col-sm-3 text-center">
                             <p class="pb-2" style="margin-bottom: 132px;"><strong>Recommended By</strong></p>
                             <hr>
-                            <p><strong>DM/Manager Service</strong></p>
+                            <p><strong>AGM, Service</strong></p>
                         </div>
 
                         <div class="col-sm-3 text-center">

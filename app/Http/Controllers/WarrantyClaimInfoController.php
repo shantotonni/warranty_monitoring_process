@@ -103,6 +103,7 @@ class WarrantyClaimInfoController extends Controller
                     'RepairDate' => $parts->warranty_claim->RepairDate,
                     'JobCardDate' => $parts->warranty_claim->JobCardDate,
                     'WarrantyClaimDate' => $parts->warranty_claim->WarrantyClaimDate,
+                    'RunningHour' => $parts->warranty_claim->RunningHour,
                     'WarrantyNumber' => 'HAR/WRT/'.$parts->warranty_claim->Id,
                 ];
             }
