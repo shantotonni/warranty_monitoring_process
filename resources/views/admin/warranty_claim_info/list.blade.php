@@ -423,7 +423,6 @@
                             @endforeach
                         </tbody>
                     </table>
-
                 </div>
                 <!-- /.card-body -->
                 <div class="d-flex justify-content-end mt-1">{{ $warrantyClaims->withQueryString()->links() }}</div>

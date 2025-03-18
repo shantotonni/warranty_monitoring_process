@@ -189,9 +189,9 @@
                                         //dd($result);
                                         ?>
                                         @foreach ($result as $key => $item)
-                        
+
                                             <td>{{ $item['DateOfService'] }}</td>
-                                    
+
                                         @endforeach
                                     </tr>
                                     <tr>
@@ -263,6 +263,33 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+
+                        <br><br><br><br><br>
+
+                        <div class="row">
+                            <!-- <div class="col-sm-1" style="margin-left: -50px;"></div> -->
+                            <div class="col-sm-3 text-center">
+                                <p class="pb-2"  style="margin-bottom: 132px;"><strong>Proposed By</strong></p>
+                                <hr>
+                                <p><strong>SE/Sr.SE/TMS</strong></p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="pb-2" style="margin-bottom: 132px;"><strong>Checked By</strong></p>
+                                <hr>
+                                <p><strong>DM, Service</strong></p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="pb-2" style="margin-bottom: 132px;"><strong>Recommended By</strong></p>
+                                <hr>
+                                <p><strong>AGM, Service</strong></p>
+                            </div>
+
+                            <div class="col-sm-3 text-center">
+                                <p class="pb-2" style="margin-bottom: 132px;"><strong>Approved By</strong></p>
+                                <hr>
+                                <p><strong>CBO, Motors</strong></p>
                             </div>
                         </div>
 
